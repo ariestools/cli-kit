@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "xy-development": {
+      "source": "XYOracleNetwork/xyo-skills",
+      "sourceType": "github",
+      "skillPath": "skills/xy-development/SKILL.md",
+      "computedHash": "c6f2d528056529c4cf92dd91b156799c543f5268fc573cf3eb72da76ef83a5f1"
+    },
+    "xy-toolchain": {
+      "source": "XYOracleNetwork/xyo-skills",
+      "sourceType": "github",
+      "skillPath": "skills/xy-toolchain/SKILL.md",
+      "computedHash": "20e12133813917207721d2c7f3418ad1122d200fe84e3709b3a543a4aa4f8d56"
+    }
+  }
+}
