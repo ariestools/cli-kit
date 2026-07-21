@@ -1,0 +1,65 @@
+{
+  "name": "@ariestools/cli-kit",
+  "version": "1.0.0",
+  "description": "Reusable actor lifecycle core for command-line applications",
+  "keywords": [
+    "ariestools",
+    "cli",
+    "typescript",
+    "esm"
+  ],
+  "homepage": "https://ariestools.ai",
+  "bugs": {
+    "url": "https://github.com/ariestools/cli-kit/issues",
+    "email": "support@ariestools.ai"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ariestools/cli-kit.git",
+    "directory": "packages/cli-kit"
+  },
+  "license": "LGPL-3.0-only",
+  "author": {
+    "name": "Arie Trouw",
+    "email": "support@ariestools.ai",
+    "url": "https://ariestools.ai"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/node/index.d.ts",
+      "default": "./dist/node/index.mjs"
+    },
+    "./package.json": "./package.json",
+    "./README.md": "./README.md"
+  },
+  "files": [
+    "dist",
+    "!**/*.bench.*",
+    "!**/*.spec.*",
+    "!**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:ci": "vitest run"
+  },
+  "devDependencies": {
+    "@ariestools/toolchain": "~8.7.21",
+    "@ariestools/tsconfig": "~8.7.21",
+    "eslint": "~10.7.0",
+    "typescript": "~6.0.3",
+    "vite": "~8.1.5",
+    "vitest": "~4.1.10",
+    "eslint-import-resolver-typescript": "~4.4.5"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "engineStrict": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

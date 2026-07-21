@@ -1,0 +1,5 @@
+{
+  "exclude": [".yarn", "dist", "docs", "**/dist", "**/docs", "packages"],
+  "extends": "@ariestools/tsconfig",
+  "include": ["**/*"]
+}

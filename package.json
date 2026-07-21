@@ -1,0 +1,43 @@
+{
+  "name": "@ariestools/cli-kit-build",
+  "private": true,
+  "description": "Reusable actor lifecycle primitives for command-line applications",
+  "keywords": [
+    "ariestools",
+    "cli",
+    "typescript",
+    "esm"
+  ],
+  "homepage": "https://ariestools.ai",
+  "bugs": {
+    "url": "https://github.com/ariestools/cli-kit/issues",
+    "email": "support@ariestools.ai"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ariestools/cli-kit.git"
+  },
+  "license": "LGPL-3.0-only",
+  "author": {
+    "name": "Arie Trouw",
+    "email": "support@ariestools.ai",
+    "url": "https://ariestools.ai"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "devDependencies": {
+    "@ariestools/eslint-config-flat": "~8.7.21",
+    "@ariestools/toolchain": "~8.7.21",
+    "@ariestools/tsconfig": "~8.7.21",
+    "eslint": "~10.7.0",
+    "eslint-import-resolver-typescript": "~4.4.5",
+    "typescript": "~6.0.3",
+    "vite": "~8.1.5",
+    "vitest": "~4.1.10"
+  },
+  "packageManager": "pnpm@11.13.1+sha512.b2fc7683b8a6525414e7d13e1ba28caaddde96bf66ec540bfaeb7e702b81f3e0be4d1f295edf7f9fe0396740a8dce4509c582ddf79891f4543fea32d37645f25",
+  "engineStrict": true,
+  "volta": {
+    "node": "24.14.1"
+  }
+}

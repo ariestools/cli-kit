@@ -1,0 +1,44 @@
+# Build outputs (root)
+/build
+/dist
+/docs
+
+# Build outputs (packages)
+packages/*/build
+packages/*/dist
+packages/*/docs
+
+# Coverage
+/coverage
+packages/*/coverage
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+.xy/cache
+
+# OS
+.DS_Store
+
+# Node
+node_modules
+
+# Lint
+.eslintcache
+
+# Claude Code
+CLAUDE.local.md
+.claude-worktrees
+
+.pnpm-store
+
+# Pack artifacts
+*.tgz
