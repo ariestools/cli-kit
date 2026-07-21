@@ -170,7 +170,8 @@ function assertPackagesBuilt(): void {
 
 function newestPublishedSourceModification(directory: string): number {
   let newest = 0
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+  const entries = fs.readdirSync(directory, { withFileTypes: true })
+  for (const entry of entries) {
     if (entry.isDirectory()) {
       if (entry.name !== 'spec') {
         newest = Math.max(newest, newestPublishedSourceModification(PATH.join(directory, entry.name)))

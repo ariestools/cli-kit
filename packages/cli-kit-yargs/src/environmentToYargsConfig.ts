@@ -38,13 +38,13 @@ export function environmentToYargsConfig(
   prefix: string,
 ): Record<string, string | undefined> {
   const config: Record<string, string | undefined> = {}
-  for (const environmentName of Object.keys(environment)) {
+  for (const [environmentName, environmentValue] of Object.entries(environment)) {
     if (!environmentName.startsWith(prefix)) continue
     const keys = environmentName.split('__').map((key, index) => {
       return camelCaseEnvironmentSegment(index === 0 ? key.slice(prefix.length) : key)
     })
     const configKey = keys.join('.')
-    if (!Object.hasOwn(config, configKey)) config[configKey] = environment[environmentName]
+    if (!Object.hasOwn(config, configKey)) config[configKey] = environmentValue
   }
   return config
 }

@@ -38,7 +38,7 @@ function reportFailureHandlerError(host: ProcessHost, result: FailureHandlerResu
 }
 
 /**
- * Runs a configured Yargs application through the supplied process boundary.
+ * Runs a configured Yargs app through the supplied process boundary.
  * Yargs' parse callback prevents its default console and process.exit calls;
  * the adapter then routes the equivalent output and exit through ProcessHost.
  */

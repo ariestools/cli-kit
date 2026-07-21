@@ -72,7 +72,8 @@ export class RuntimeSession {
   requestExit(host: Pick<ProcessHost, 'exit'>, exitCode: number): Promise<void> {
     this._exitCode = Math.max(this._exitCode ?? exitCode, exitCode)
     this._exitHost ??= host
-    this._exitPromise ??= Promise.resolve().then(() => {
+    this._exitPromise ??= Promise.try(async () => {
+      await Promise.resolve()
       this._exitHost?.exit(this._exitCode ?? exitCode)
     })
     return this._exitPromise
@@ -85,7 +86,10 @@ export class RuntimeSession {
     if (this._interruptPromise === undefined) this.disposeInterrupt()
     if (this._stopPromise === undefined) {
       this._state = 'stopping'
-      this._stopPromise = Promise.resolve().then(async () => await this.stopOnce())
+      this._stopPromise = Promise.try(async () => {
+        await Promise.resolve()
+        await this.stopOnce()
+      })
     }
     return this._stopPromise
   }
@@ -101,9 +105,14 @@ export class RuntimeSession {
   private handleInterrupt(listener: RuntimeInterruptListener): Promise<void> {
     if (this._interruptPromise === undefined) {
       if (this._isInterruptDisposed) return Promise.resolve()
-      this._interruptPromise = Promise.resolve()
-        .then(async () => await listener())
-        .finally(() => this.disposeInterrupt())
+      this._interruptPromise = Promise.try(async () => {
+        await Promise.resolve()
+        try {
+          await listener()
+        } finally {
+          this.disposeInterrupt()
+        }
+      })
     }
     return this._interruptPromise
   }

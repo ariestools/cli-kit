@@ -9,7 +9,7 @@ export interface RunProcessApplicationOptions {
 }
 
 /**
- * Runs one CLI application at the outermost process boundary.
+ * Runs one CLI app at the outermost process boundary.
  *
  * Immediate exits requested through `exitProcess` have already been
  * routed to the host and are absorbed here. Unexpected failures retain the

@@ -8,7 +8,7 @@ const nodeProcessIO: ProcessIO = {
     return PROCESS.stdout.columns
   },
   get isInteractive(): boolean {
-    return Boolean(PROCESS.stdin.isTTY && PROCESS.stdout.isTTY)
+    return PROCESS.stdin.isTTY && PROCESS.stdout.isTTY
   },
   error(...values: readonly unknown[]): void {
     console.error(...values)

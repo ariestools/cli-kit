@@ -16,14 +16,8 @@ interface InterruptHost {
 }
 
 function createDeferred(): Deferred {
-  let resolvePromise: (() => void) | undefined
-  const promise = new Promise<void>((resolve) => {
-    resolvePromise = resolve
-  })
-  return {
-    promise,
-    resolve: () => resolvePromise?.(),
-  }
+  const { promise, resolve } = Promise.withResolvers<void>()
+  return { promise, resolve }
 }
 
 function interruptHost(events: string[] = []): InterruptHost {

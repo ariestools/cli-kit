@@ -56,14 +56,18 @@ describe('runYargsApplication', () => {
     const result = fakeHost(['--help'])
     const handler = vi.fn()
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .command({ command: ['$0'], handler })
-        .help()
-        .version('1.2.3'),
-      host: result.host,
-    }).catch(error => expectExit(error, 0))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({ command: ['$0'], handler })
+          .help()
+          .version('1.2.3'),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 0)
+    }
 
     expect(handler).not.toHaveBeenCalled()
     expect(result.errors).toEqual([])
@@ -75,10 +79,14 @@ describe('runYargsApplication', () => {
   it('routes version through the host and exits zero', async () => {
     const result = fakeHost(['--version'])
 
-    await runYargsApplication({
-      configure: parser => parser.scriptName('fixture').version('1.2.3'),
-      host: result.host,
-    }).catch(error => expectExit(error, 0))
+    try {
+      await runYargsApplication({
+        configure: parser => parser.scriptName('fixture').version('1.2.3'),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 0)
+    }
 
     expect(result.errors).toEqual([])
     expect(result.exits).toEqual([0])
@@ -89,18 +97,22 @@ describe('runYargsApplication', () => {
     const result = fakeHost(['serve'])
     const handler = vi.fn()
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .command({
-          builder: command => command.demandOption('required'),
-          command: 'serve',
-          handler,
-        })
-        .help()
-        .version(false),
-      host: result.host,
-    }).catch(error => expectExit(error, 1))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            builder: command => command.demandOption('required'),
+            command: 'serve',
+            handler,
+          })
+          .help()
+          .version(false),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
 
     expect(handler).not.toHaveBeenCalled()
     expect(result.errors).toHaveLength(1)
@@ -114,20 +126,24 @@ describe('runYargsApplication', () => {
     const result = fakeHost(['serve'])
     const failure = new Error('handler failed')
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .command({
-          builder: command => command.option('local', { type: 'string' }),
-          command: 'serve',
-          handler: async () => {
-            throw failure
-          },
-        })
-        .help()
-        .version(false),
-      host: result.host,
-    }).catch(error => expectExit(error, 1))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            builder: command => command.option('local', { type: 'string' }),
+            command: 'serve',
+            handler: async () => {
+              throw failure
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
 
     expect(result.errors).toHaveLength(3)
     expect(result.errors[0]?.[0]).toContain('fixture serve')
@@ -146,20 +162,24 @@ describe('runYargsApplication', () => {
       expect(result.exits).toEqual([])
     })
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .command({
-          command: 'serve',
-          handler: async () => {
-            throw failure
-          },
-        })
-        .help()
-        .version(false),
-      host: result.host,
-      onFailure,
-    }).catch(error => expectExit(error, 1))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              throw failure
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        onFailure,
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
 
     expect(onFailure).toHaveBeenCalledOnce()
     expect(result.errors).toHaveLength(3)
@@ -172,22 +192,26 @@ describe('runYargsApplication', () => {
     const failure = new Error('handler failed')
     const failureHandlerError = new Error('cleanup failed')
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .command({
-          command: 'serve',
-          handler: async () => {
-            throw failure
-          },
-        })
-        .help()
-        .version(false),
-      host: result.host,
-      onFailure: async () => {
-        throw failureHandlerError
-      },
-    }).catch(error => expectExit(error, 1))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              throw failure
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        onFailure: async () => {
+          throw failureHandlerError
+        },
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
 
     expect(result.errors).toHaveLength(4)
     expect(result.errors[2]).toEqual([failure])
@@ -200,17 +224,21 @@ describe('runYargsApplication', () => {
     const failure = new Error('middleware failed')
     const handler = vi.fn()
 
-    await runYargsApplication({
-      configure: parser => parser
-        .scriptName('fixture')
-        .middleware(async () => {
-          throw failure
-        })
-        .command({ command: 'serve', handler })
-        .help()
-        .version(false),
-      host: result.host,
-    }).catch(error => expectExit(error, 1))
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .middleware(async () => {
+            throw failure
+          })
+          .command({ command: 'serve', handler })
+          .help()
+          .version(false),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
 
     expect(handler).not.toHaveBeenCalled()
     expect(result.errors).toHaveLength(3)

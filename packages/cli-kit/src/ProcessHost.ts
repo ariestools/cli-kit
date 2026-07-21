@@ -1,4 +1,4 @@
-/** Process-facing input and output used by a command-line application. */
+/** Process-facing input and output used by a command-line app. */
 export interface ProcessIO {
   /** Available terminal width when output is attached to a sized terminal. */
   readonly columns?: number
@@ -21,7 +21,7 @@ export class ProcessExitError extends Error {
 }
 
 /**
- * Structural process boundary for a command-line application.
+ * Structural process boundary for a command-line app.
  *
  * Production implementations may terminate from {@link exit}; recording hosts
  * may return after retaining the requested status.
@@ -29,7 +29,7 @@ export class ProcessExitError extends Error {
 export interface ProcessHost {
   /** Full argument vector, including the executable and script entries. */
   readonly argv: readonly string[]
-  /** Environment visible to this application invocation. */
+  /** Environment visible to this app invocation. */
   readonly environment: Readonly<Record<string, string | undefined>>
   readonly io: ProcessIO
   readonly isDevelopment: boolean

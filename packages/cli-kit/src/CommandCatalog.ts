@@ -1,6 +1,6 @@
 import type { ProcessHost } from './ProcessHost.ts'
 
-/** Process capability shared by every command created for one CLI application. */
+/** Process capability shared by every command created for one CLI app. */
 export interface CliApplicationContext {
   readonly host: ProcessHost
 }
@@ -12,7 +12,7 @@ export interface CommandDefinition<TContext extends CliApplicationContext, TComm
   readonly id: string
 }
 
-/** Ordered command factories materialized for one application context. */
+/** Ordered command factories materialized for one app context. */
 export interface CommandCatalog<TContext extends CliApplicationContext, TCommand> {
   readonly createCommands: (context: TContext) => readonly TCommand[]
   readonly ids: readonly string[]
