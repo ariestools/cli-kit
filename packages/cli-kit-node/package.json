@@ -1,6 +1,6 @@
 {
   "name": "@ariestools/cli-kit-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node.js process adapter for reusable actor command-line applications",
   "keywords": [
     "ariestools",
@@ -55,10 +55,10 @@
     "@ariestools/tsconfig": "~8.7.21",
     "@types/node": "~26.1.1",
     "eslint": "~10.7.0",
+    "eslint-import-resolver-typescript": "~4.4.5",
     "typescript": "~6.0.3",
     "vite": "~8.1.5",
-    "vitest": "~4.1.10",
-    "eslint-import-resolver-typescript": "~4.4.5"
+    "vitest": "~4.1.10"
   },
   "engines": {
     "node": ">=24"
