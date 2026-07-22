@@ -9,6 +9,11 @@ The package keeps Yargs out of `@ariestools/cli-kit` while routing parser help, 
 Use `environmentToYargsConfig` when an application owns config-file loading and wants to replace Yargs' process-global `.env()` lookup with an explicitly supplied environment. The resulting flat dotted object preserves Yargs' environment key normalization and can be passed to `.config()` before parsing:
 
 ```ts
+import { createNodeProcessHostWithDotEnv } from '@ariestools/cli-kit-node'
+import { environmentToYargsConfig, runYargsApplication } from '@ariestools/cli-kit-yargs'
+
+const host = createNodeProcessHostWithDotEnv()
+
 await runYargsApplication({
   host,
   configure: parser => parser
@@ -20,7 +25,7 @@ await runYargsApplication({
 })
 ```
 
-This conversion preserves command-line-over-environment precedence, but it is not a general substitute for `.env()` in applications that also use Yargs-native config-file options: Yargs ranks config objects below config files, and treats a top-level `extends` key in a config object specially. Such applications should resolve those precedence and reserved-key rules before passing the object to `.config()`.
+Load dotenv files through `@ariestools/cli-kit-node` (`loadDotEnvFile` / `createNodeProcessHostWithDotEnv`) so values reach `host.environment` without mutating `process.env`. This conversion preserves command-line-over-environment precedence, but it is not a general substitute for Yargs-native config-file options: Yargs ranks config objects below config files, and treats a top-level `extends` key in a config object specially. Such applications should resolve those precedence and reserved-key rules before passing the object to `.config()`.
 
 ## License
 

@@ -16,6 +16,38 @@ await runProcessApplication({
 })
 ```
 
+## Dotenv composition
+
+Prefer loading local `.env` values into the host environment instead of mutating `process.env`. File values act as defaults: defined process environment entries always win.
+
+```ts
+import { createNodeProcessHostWithDotEnv } from '@ariestools/cli-kit-node'
+import { environmentToYargsConfig, runYargsApplication } from '@ariestools/cli-kit-yargs'
+
+const host = createNodeProcessHostWithDotEnv()
+// or explicitly:
+// createNodeProcessHost({
+//   environmentDefaults: loadDotEnvFile({ path: '.env' }),
+// })
+
+await runYargsApplication({
+  host,
+  configure: parser => parser
+    .config(environmentToYargsConfig(host.environment, 'XL1'))
+    .scriptName('xl1')
+    .help(),
+})
+```
+
+Helpers:
+
+| Export | Role |
+|--------|------|
+| `parseDotEnv` | Pure dotenv-format string parser |
+| `loadDotEnvFile` | Read a file (missing → `{}`); never mutates `process.env` |
+| `mergeEnvironments` | Primary-first merge for env layers |
+| `createNodeProcessHostWithDotEnv` | Host with `.env` merged under live `process.env` |
+
 Application code should depend on the `ProcessHost` contract from `@ariestools/cli-kit`. Use this package only at the Node.js composition boundary.
 
 ## License

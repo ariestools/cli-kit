@@ -9,7 +9,7 @@ This monorepo is intentionally independent of XL1 and xyo-chain. Application pac
 | Package | Description |
 |---------|-------------|
 | [`@ariestools/cli-kit`](packages/cli-kit) | Core actor lifecycle, process application boundary, command catalog |
-| [`@ariestools/cli-kit-node`](packages/cli-kit-node) | Node.js `ProcessHost` adapter |
+| [`@ariestools/cli-kit-node`](packages/cli-kit-node) | Node.js `ProcessHost` adapter, pure dotenv load/merge helpers |
 | [`@ariestools/cli-kit-yargs`](packages/cli-kit-yargs) | Yargs adapter routed through `ProcessHost` |
 
 ## Install

@@ -1,16 +1,23 @@
+import fs from 'node:fs'
+import os from 'node:os'
+import PATH from 'node:path'
+
 import {
   afterEach, beforeEach, describe, expect, it, vi,
 } from 'vitest'
 
-const processRuntime = vi.hoisted(() => ({
-  argv: ['node', 'application.mjs', '--help'],
-  env: { NODE_ENV: 'development' },
-  exit: vi.fn<(code: number) => void>(),
-  on: vi.fn<(event: string, listener: () => void) => void>(),
-  off: vi.fn<(event: string, listener: () => void) => void>(),
-  stdin: { isTTY: true },
-  stdout: { columns: 120, isTTY: true },
-}))
+const processRuntime = vi.hoisted(() => {
+  const env: Record<string, string | undefined> = { NODE_ENV: 'development' }
+  return {
+    argv: ['node', 'application.mjs', '--help'],
+    env,
+    exit: vi.fn<(code: number) => void>(),
+    on: vi.fn<(event: string, listener: () => void) => void>(),
+    off: vi.fn<(event: string, listener: () => void) => void>(),
+    stdin: { isTTY: true },
+    stdout: { columns: 120, isTTY: true },
+  }
+})
 
 const readlineRuntime = vi.hoisted(() => ({
   close: vi.fn<() => void>(),
@@ -21,7 +28,9 @@ const readlineRuntime = vi.hoisted(() => ({
 vi.mock('node:process', () => ({ default: processRuntime }))
 vi.mock('node:readline/promises', () => ({ createInterface: readlineRuntime.createInterface }))
 
-import { createNodeProcessHost, nodeProcessHost } from '../nodeProcessHost.ts'
+import {
+  createNodeProcessHost, createNodeProcessHostWithDotEnv, nodeProcessHost,
+} from '../nodeProcessHost.ts'
 
 describe('nodeProcessHost', () => {
   beforeEach(() => {
@@ -59,6 +68,52 @@ describe('nodeProcessHost', () => {
     expect(nodeProcessHost.io.columns).toBe(80)
     expect(nodeProcessHost.io.isInteractive).toBe(false)
     expect(nodeProcessHost.isDevelopment).toBe(false)
+  })
+
+  it('uses an explicit environment override instead of process.env', () => {
+    const environment = { NODE_ENV: 'production', XL1_FOO: 'override' }
+    const host = createNodeProcessHost({ environment })
+
+    expect(host.environment).toBe(environment)
+    expect(host.isDevelopment).toBe(false)
+  })
+
+  it('merges environmentDefaults under live process.env without mutation', () => {
+    processRuntime.env = { NODE_ENV: 'development', SHARED: 'process' }
+    const host = createNodeProcessHost({ environmentDefaults: { FROM_FILE: 'file', SHARED: 'file' } })
+
+    expect(host.environment).toEqual({
+      FROM_FILE: 'file',
+      NODE_ENV: 'development',
+      SHARED: 'process',
+    })
+    expect(processRuntime.env).toEqual({ NODE_ENV: 'development', SHARED: 'process' })
+
+    processRuntime.env = { NODE_ENV: 'production', SHARED: 'later' }
+    expect(host.environment).toEqual({
+      FROM_FILE: 'file',
+      NODE_ENV: 'production',
+      SHARED: 'later',
+    })
+    expect(host.isDevelopment).toBe(false)
+  })
+
+  it('loads dotenv defaults through createNodeProcessHostWithDotEnv', () => {
+    const cwd = fs.mkdtempSync(PATH.join(os.tmpdir(), 'cli-kit-host-dotenv-'))
+    try {
+      fs.writeFileSync(PATH.join(cwd, '.env'), 'FROM_FILE=yes\nSHARED=file\n')
+      processRuntime.env = { SHARED: 'process' }
+
+      const host = createNodeProcessHostWithDotEnv({ cwd })
+
+      expect(host.environment).toEqual({
+        FROM_FILE: 'yes',
+        SHARED: 'process',
+      })
+      expect(processRuntime.env).toEqual({ SHARED: 'process' })
+    } finally {
+      fs.rmSync(cwd, { recursive: true, force: true })
+    }
   })
 
   it('routes output through the Node console', () => {
