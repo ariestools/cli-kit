@@ -4,6 +4,8 @@ Yargs adapter for reusable actor command-line applications.
 
 The package keeps Yargs out of `@ariestools/cli-kit` while routing parser help, version, validation errors, asynchronous failures, and exits through the core `ProcessHost` boundary. This makes a configured CLI safe to exercise with a recording host instead of allowing Yargs to write to the ambient console or terminate the test process.
 
+`runYargsApplication` accepts an optional `mapFailureToExitCode` mapper applied to parser and handler failures alike: the mapper receives the failure origin (`'parse'` for validation failures, `'handler'` for handler or middleware rejections), returning a number selects the exit code, `undefined` retains the default exit code one, and help and error output are unchanged. A mapper that throws, or returns a code outside the integer range 0–255, falls back to exit code one. Intentional `ProcessExitError` exits pass through untouched.
+
 Use `environmentToYargsConfig` when an application owns config-file loading and wants to replace Yargs' process-global `.env()` lookup with an explicitly supplied environment. The resulting flat dotted object preserves Yargs' environment key normalization and can be passed to `.config()` before parsing:
 
 ```ts

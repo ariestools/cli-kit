@@ -1,5 +1,5 @@
 import {
-  exitProcess, ProcessExitError, type ProcessHost,
+  exitProcess, type FailureExitCodeMapper, ProcessExitError, type ProcessHost, resolveFailureExitCode,
 } from '@ariestools/cli-kit'
 import type { Argv } from 'yargs'
 import yargs from 'yargs'
@@ -8,6 +8,17 @@ import { hideBin } from 'yargs/helpers'
 export interface RunYargsApplicationOptions {
   readonly configure: (parser: Argv) => Argv
   readonly host: ProcessHost
+  /**
+   * Optional failure policy applied to parser and handler failures alike.
+   * The mapper receives the failure origin (`'parse'` for validation
+   * failures, `'handler'` for handler or middleware rejections) so exit
+   * codes such as `usage` versus `software` need no error sniffing.
+   * Returning a number selects the exit code; `undefined`, a thrown mapper,
+   * or a result outside the integer range 0–255 retains the default exit
+   * code one. Intentional `ProcessExitError` exits are never offered to
+   * the mapper.
+   */
+  readonly mapFailureToExitCode?: FailureExitCodeMapper
   readonly onFailure?: (error: unknown) => Promise<void> | void
 }
 
@@ -45,6 +56,7 @@ function reportFailureHandlerError(host: ProcessHost, result: FailureHandlerResu
 export async function runYargsApplication({
   configure,
   host,
+  mapFailureToExitCode,
   onFailure,
 }: RunYargsApplicationOptions): Promise<void> {
   const applicationArguments = hideBin([...host.argv])
@@ -65,7 +77,7 @@ export async function runYargsApplication({
     host.io.error()
     host.io.error(error)
     reportFailureHandlerError(host, failureHandlerResult)
-    exitProcess(host, 1)
+    exitProcess(host, resolveFailureExitCode(mapFailureToExitCode, error, 'handler'))
   }
 
   if (captured.error !== undefined) {
@@ -76,7 +88,7 @@ export async function runYargsApplication({
       host.io.error(captured.error)
     }
     reportFailureHandlerError(host, failureHandlerResult)
-    exitProcess(host, 1)
+    exitProcess(host, resolveFailureExitCode(mapFailureToExitCode, captured.error, 'parse'))
   }
 
   if (captured.output.length > 0) {

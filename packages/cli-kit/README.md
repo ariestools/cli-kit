@@ -6,7 +6,9 @@ This package is intentionally independent of XL1 and xyo-chain. Application pack
 
 The package also provides structural `ProcessHost` and `ProcessIO` boundaries for adapting an application's concrete process runtime without importing Node APIs into the core. Arguments, environment values, terminal width, output, prompts, interrupts, and exits are all supplied by the host. Use `exitProcess` at exit points that occur before the end of a command: production hosts may terminate immediately, while recording hosts receive a `ProcessExitError` that stops control flow deterministically. `RuntimeSession` owns one application-supplied stop operation and preserves fail-fast shutdown behavior while making repeated stop requests idempotent. It can also own one structural interrupt binding, coalesce repeated interrupts while the application listener settles, and dispose the binding at the correct manual or interrupt-driven shutdown boundary.
 
-`runProcessApplication` owns the outermost application failure boundary. It absorbs standardized exit signals that have already been routed through a `ProcessHost`, hides unexpected error details outside development, and requests exit code one for unhandled failures. Concrete process adapters remain separate packages; Node applications can use `@ariestools/cli-kit-node`.
+`runProcessApplication` owns the outermost application failure boundary. It absorbs standardized exit signals that have already been routed through a `ProcessHost`, hides unexpected error details outside development, and requests exit code one for unhandled failures. An optional `mapFailureToExitCode` mapper lets the application select a different exit code per failure; it receives the error plus a `FailureOrigin` (`'parse'` or `'handler'`), returning `undefined` retains the default one, and intentional `ProcessExitError` exits are never offered to the mapper. The mapper stays inside the failure boundary: a mapper that throws, or returns a code outside the integer range 0–255, falls back to exit code one instead of escaping the boundary. Concrete process adapters remain separate packages; Node applications can use `@ariestools/cli-kit-node`.
+
+`SYS_EXITS` supplies the BSD `sysexits.h` exit-code vocabulary used across applications (`ok`, `usage`, `dataErr`, `noInput`, `software`, `ioErr`, `config`), with `SysExitCode` as the derived literal union. Use it with `exitProcess` or a `mapFailureToExitCode` mapper instead of repeating numeric literals.
 
 `createCommandCatalog` registers ordered command factories against a structural `CliApplicationContext`. The command type is supplied by the application, so parser-specific types and domain-specific configuration remain outside the core. A catalog is immutable and reusable; each application invocation materializes fresh command objects with its own context.
 
@@ -22,7 +24,7 @@ The package also provides structural `ProcessHost` and `ProcessIO` boundaries fo
 - A runtime session accepts at most one interrupt binding while active.
 - Repeated interrupts share one listener promise and retain the binding until that listener settles.
 - Manual shutdown disposes its interrupt binding before cleanup begins.
-- Process applications absorb host-routed exits and map unexpected failures to exit code one.
+- Process applications absorb host-routed exits and map unexpected failures to exit code one, or to the code selected by an application-supplied mapper.
 - Command catalogs preserve registration order and reject blank or duplicate ids.
 - Command factories receive the exact per-application context and are invoked again for each materialization.
 

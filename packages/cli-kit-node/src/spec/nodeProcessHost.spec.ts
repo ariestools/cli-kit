@@ -21,7 +21,7 @@ const readlineRuntime = vi.hoisted(() => ({
 vi.mock('node:process', () => ({ default: processRuntime }))
 vi.mock('node:readline/promises', () => ({ createInterface: readlineRuntime.createInterface }))
 
-import { nodeProcessHost } from '../nodeProcessHost.ts'
+import { createNodeProcessHost, nodeProcessHost } from '../nodeProcessHost.ts'
 
 describe('nodeProcessHost', () => {
   beforeEach(() => {
@@ -101,19 +101,58 @@ describe('nodeProcessHost', () => {
     expect(processRuntime.exit).toHaveBeenCalledWith(7)
   })
 
-  it('registers a disposable SIGINT listener', async () => {
+  it('registers one disposable listener for both SIGINT and SIGTERM', async () => {
     const listener = vi.fn<() => Promise<void>>().mockResolvedValue()
 
     const dispose = nodeProcessHost.onInterrupt(listener)
 
+    expect(processRuntime.on).toHaveBeenCalledTimes(2)
+    expect(processRuntime.on).toHaveBeenCalledWith('SIGINT', expect.any(Function))
+    expect(processRuntime.on).toHaveBeenCalledWith('SIGTERM', expect.any(Function))
+    const sigintListener = processRuntime.on.mock.calls[0]?.[1]
+    const sigtermListener = processRuntime.on.mock.calls[1]?.[1]
+    expect(sigintListener).toBeDefined()
+    expect(sigtermListener).toBe(sigintListener)
+
+    sigintListener?.()
+    await vi.waitFor(() => expect(listener).toHaveBeenCalledOnce())
+    sigtermListener?.()
+    await vi.waitFor(() => expect(listener).toHaveBeenCalledTimes(2))
+
+    dispose()
+
+    expect(processRuntime.off).toHaveBeenCalledTimes(2)
+    expect(processRuntime.off).toHaveBeenCalledWith('SIGINT', sigintListener)
+    expect(processRuntime.off).toHaveBeenCalledWith('SIGTERM', sigtermListener)
+  })
+
+  it('narrows interrupt binding to the signals supplied to the factory', async () => {
+    const host = createNodeProcessHost({ signals: ['SIGINT'] })
+    const listener = vi.fn<() => Promise<void>>().mockResolvedValue()
+
+    const dispose = host.onInterrupt(listener)
+
+    expect(processRuntime.on).toHaveBeenCalledOnce()
     expect(processRuntime.on).toHaveBeenCalledWith('SIGINT', expect.any(Function))
     const registeredListener = processRuntime.on.mock.calls[0]?.[1]
-    expect(registeredListener).toBeDefined()
     registeredListener?.()
     await vi.waitFor(() => expect(listener).toHaveBeenCalledOnce())
 
     dispose()
 
+    expect(processRuntime.off).toHaveBeenCalledOnce()
     expect(processRuntime.off).toHaveBeenCalledWith('SIGINT', registeredListener)
+  })
+
+  it('binds nothing and disposes nothing when the factory receives no signals', () => {
+    const host = createNodeProcessHost({ signals: [] })
+    const listener = vi.fn<() => void>()
+
+    const dispose = host.onInterrupt(listener)
+    dispose()
+
+    expect(processRuntime.on).not.toHaveBeenCalled()
+    expect(processRuntime.off).not.toHaveBeenCalled()
+    expect(listener).not.toHaveBeenCalled()
   })
 })

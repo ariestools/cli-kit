@@ -2,7 +2,9 @@ import {
   describe, expect, it, vi,
 } from 'vitest'
 
-import { type ProcessApplication, runProcessApplication } from '../ProcessApplication.ts'
+import {
+  type FailureExitCodeMapper, type ProcessApplication, resolveFailureExitCode, runProcessApplication,
+} from '../ProcessApplication.ts'
 import { exitProcess, type ProcessHost } from '../ProcessHost.ts'
 
 interface RecordingHost {
@@ -92,5 +94,133 @@ describe('runProcessApplication', () => {
 
     expect(recording.errors).toEqual([])
     expect(recording.exits).toEqual([1])
+  })
+
+  it('requests the exit code selected by the failure mapper', async () => {
+    const recording = recordingHost(false)
+    const failure = new Error('bad configuration')
+    const application: ProcessApplication = async () => {
+      throw failure
+    }
+    const mapFailureToExitCode = vi.fn((error: unknown) => (error === failure ? 78 : undefined))
+
+    await runProcessApplication({
+      application,
+      host: recording.host,
+      mapFailureToExitCode,
+    })
+
+    expect(mapFailureToExitCode).toHaveBeenCalledOnce()
+    expect(mapFailureToExitCode).toHaveBeenCalledWith(failure, 'handler')
+    expect(recording.exits).toEqual([78])
+  })
+
+  it('retains exit code one when the failure mapper itself throws', async () => {
+    const recording = recordingHost(false)
+    const application: ProcessApplication = async () => {
+      throw new Error('startup failure')
+    }
+
+    await runProcessApplication({
+      application,
+      host: recording.host,
+      mapFailureToExitCode: () => {
+        throw new Error('mapper failure')
+      },
+    })
+
+    expect(recording.exits).toEqual([1])
+  })
+
+  it('retains exit code one when the failure mapper returns a non-integer code', async () => {
+    const recording = recordingHost(false)
+    const application: ProcessApplication = async () => {
+      throw new Error('startup failure')
+    }
+
+    await runProcessApplication({
+      application,
+      host: recording.host,
+      mapFailureToExitCode: () => NaN,
+    })
+
+    expect(recording.exits).toEqual([1])
+  })
+
+  it('retains exit code one when the failure mapper returns undefined', async () => {
+    const recording = recordingHost(false)
+    const application: ProcessApplication = async () => {
+      throw new Error('unmapped failure')
+    }
+
+    await runProcessApplication({
+      application,
+      host: recording.host,
+      mapFailureToExitCode: error => (error instanceof RangeError ? 78 : undefined),
+    })
+
+    expect(recording.exits).toEqual([1])
+  })
+
+  it('never offers an intentional process exit to the failure mapper', async () => {
+    const recording = recordingHost(false)
+    const application: ProcessApplication = async (host) => {
+      exitProcess(host, 7)
+    }
+    const mapFailureToExitCode = vi.fn(() => 78)
+
+    await runProcessApplication({
+      application,
+      host: recording.host,
+      mapFailureToExitCode,
+    })
+
+    expect(mapFailureToExitCode).not.toHaveBeenCalled()
+    expect(recording.exits).toEqual([7])
+  })
+})
+
+describe('resolveFailureExitCode', () => {
+  const failure = new Error('unexpected failure')
+
+  it('resolves to one without a mapper', () => {
+    expect(resolveFailureExitCode(undefined, failure, 'handler')).toBe(1)
+  })
+
+  it('passes the error and origin to the mapper and returns its code', () => {
+    const mapper = vi.fn<FailureExitCodeMapper>(() => 64)
+
+    expect(resolveFailureExitCode(mapper, failure, 'parse')).toBe(64)
+    expect(mapper).toHaveBeenCalledOnce()
+    expect(mapper).toHaveBeenCalledWith(failure, 'parse')
+  })
+
+  it('accepts the boundary codes zero and 255', () => {
+    expect(resolveFailureExitCode(() => 0, failure, 'handler')).toBe(0)
+    expect(resolveFailureExitCode(() => 255, failure, 'handler')).toBe(255)
+  })
+
+  it('resolves to one when the mapper declines', () => {
+    const mapper: FailureExitCodeMapper = error => (error instanceof RangeError ? 78 : undefined)
+
+    expect(resolveFailureExitCode(mapper, failure, 'handler')).toBe(1)
+  })
+
+  it('resolves to one when the mapper throws', () => {
+    const mapper: FailureExitCodeMapper = () => {
+      throw new Error('mapper failure')
+    }
+
+    expect(resolveFailureExitCode(mapper, failure, 'handler')).toBe(1)
+  })
+
+  it.each([
+    ['NaN', NaN],
+    ['a fractional code', 64.5],
+    ['a negative code', -1],
+    ['a code above 255', 256],
+    ['an unsafe magnitude', Infinity],
+  ])('resolves to one for %s', (_label, code) => {
+    expect(resolveFailureExitCode(() => code, failure, 'handler')).toBe(1)
   })
 })

@@ -272,6 +272,148 @@ describe('runYargsApplication', () => {
     expect(result.logs).toEqual([])
   })
 
+  it('exits with the mapper-selected code for a rejected handler error', async () => {
+    const result = fakeHost(['serve'])
+    const failure = new Error('handler failed')
+    const mapFailureToExitCode = vi.fn((error: unknown) => (error === failure ? 70 : undefined))
+
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              throw failure
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        mapFailureToExitCode,
+      })
+    } catch (error) {
+      expectExit(error, 70)
+    }
+
+    expect(mapFailureToExitCode).toHaveBeenCalledOnce()
+    expect(mapFailureToExitCode).toHaveBeenCalledWith(failure, 'handler')
+    expect(result.errors).toHaveLength(3)
+    expect(result.errors[2]).toEqual([failure])
+    expect(result.exits).toEqual([70])
+  })
+
+  it('routes a parse failure through the mapper while keeping its help output', async () => {
+    const result = fakeHost(['serve'])
+    const handler = vi.fn()
+    const mapFailureToExitCode = vi.fn(() => 64)
+
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            builder: command => command.demandOption('required'),
+            command: 'serve',
+            handler,
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        mapFailureToExitCode,
+      })
+    } catch (error) {
+      expectExit(error, 64)
+    }
+
+    expect(handler).not.toHaveBeenCalled()
+    expect(mapFailureToExitCode).toHaveBeenCalledOnce()
+    expect(mapFailureToExitCode).toHaveBeenCalledWith(expect.any(Error), 'parse')
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]?.[0]).toContain('fixture serve')
+    expect(result.errors[0]?.[0]).toContain('Missing required argument: required')
+    expect(result.exits).toEqual([64])
+    expect(result.logs).toEqual([])
+  })
+
+  it('retains exit code one when the mapper returns undefined', async () => {
+    const result = fakeHost(['serve'])
+
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              throw new Error('handler failed')
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        mapFailureToExitCode: error => (error instanceof RangeError ? 78 : undefined),
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
+
+    expect(result.exits).toEqual([1])
+  })
+
+  it('retains exit code one and the failure output when the mapper itself throws', async () => {
+    const result = fakeHost(['serve'])
+    const failure = new Error('handler failed')
+
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              throw failure
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+        mapFailureToExitCode: () => {
+          throw new Error('mapper failure')
+        },
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
+
+    expect(result.errors).toHaveLength(3)
+    expect(result.errors[2]).toEqual([failure])
+    expect(result.exits).toEqual([1])
+  })
+
+  it('never offers an intentional process exit to the mapper', async () => {
+    const result = fakeHost(['stop'])
+    const requestedExit = new ProcessExitError(7)
+    const mapFailureToExitCode = vi.fn(() => 78)
+
+    const promise = runYargsApplication({
+      configure: parser => parser.command({
+        command: 'stop',
+        handler: () => {
+          result.host.exit(7)
+          throw requestedExit
+        },
+      }),
+      host: result.host,
+      mapFailureToExitCode,
+    })
+
+    await expect(promise).rejects.toBe(requestedExit)
+    expect(mapFailureToExitCode).not.toHaveBeenCalled()
+    expect(result.errors).toEqual([])
+    expect(result.exits).toEqual([7])
+  })
+
   it('passes only arguments after the runtime and executable entries', async () => {
     const result = fakeHost(['inspect', '--value', 'kept'])
     let received: ArgumentsCamelCase<{ value?: string }> | undefined
