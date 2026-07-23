@@ -1,6 +1,6 @@
 {
   "name": "@ariestools/cli-kit-yargs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Yargs adapter for reusable actor command-line applications",
   "keywords": [
     "ariestools",

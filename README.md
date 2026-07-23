@@ -18,6 +18,19 @@ This monorepo is intentionally independent of XL1 and xyo-chain. Application pac
 pnpm add @ariestools/cli-kit @ariestools/cli-kit-node @ariestools/cli-kit-yargs
 ```
 
+## Application shell pattern (reference)
+
+For a full product CLI, copy the public **lifehash-indexer** shell rather than inventing a new process boundary:
+
+| Layer | Kit API | Reference location |
+|-------|---------|--------------------|
+| Process boundary | `runProcessApplication`, `createNodeProcessHost` | `lifehash/packages/indexer/bin/lifehash-indexer.mjs` |
+| Yargs + exits | `runYargsApplication`, `rejectUnknownCommands`, `SYS_EXITS` | `src/cli/runIndexerCli.ts`, `mapIndexerFailure.ts` |
+| Commands | `createCommandCatalog`, `CliApplicationContext` | `src/cli/indexerCommandCatalog.ts` |
+| Long-running serve | `runServiceUntilInterrupt` | webble `serve` / `local` commands |
+
+Golden template repo path: [`XYOracleNetwork/lifehash` → `packages/indexer`](https://github.com/XYOracleNetwork/lifehash/tree/main/packages/indexer).
+
 ## Development
 
 ```sh

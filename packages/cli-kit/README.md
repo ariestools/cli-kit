@@ -12,6 +12,20 @@ The package also provides structural `ProcessHost` and `ProcessIO` boundaries fo
 
 `createCommandCatalog` registers ordered command factories against a structural `CliApplicationContext`. The command type is supplied by the application, so parser-specific types and domain-specific configuration remain outside the core. A catalog is immutable and reusable; each application invocation materializes fresh command objects with its own context.
 
+`runServiceUntilInterrupt` blocks a long-running command handler until the first host interrupt, disposes the listener, then awaits an application-supplied `stop` cleanup. Use it for serve-style commands that should drain cleanly on SIGINT/SIGTERM.
+
+## Application shell pattern (reference)
+
+The public package [`@xyo-network/lifehash-indexer`](https://github.com/XYOracleNetwork/lifehash/tree/main/packages/indexer) is the golden template for a product CLI on this kit:
+
+1. **Bin / process boundary** — `runProcessApplication` + `createNodeProcessHost` (or `nodeProcessHost`) so the library bundle stays free of process side effects.
+2. **Yargs adapter** — `runYargsApplication` with an app-owned `configure*` helper that applies `rejectUnknownCommands`, `.strictOptions()`, help/version, and `host.io.columns` wrapping.
+3. **Command catalog** — `createCommandCatalog` over a `CliApplicationContext` that at least carries `host`, so tests inject a recording `ProcessHost` without touching `process`.
+4. **Failure policy** — a `FailureExitCodeMapper` that maps parse vs handler failures onto `SYS_EXITS` (`usage` / `config` / `software`, …).
+5. **Domain commands** — yargs `CommandModule` factories that take context and never import Node process globals for env/argv/exit.
+
+Sibling shells that follow the same shape include `@xyo-network/webble-cli` and `@xyo-network/webble-dapp`. Actor-heavy CLIs (for example `@xyo-network/xl1-cli-lib`) layer `createActorBuilderCatalog`, `ManagedActor`, and `RuntimeSession` on top of the same process boundary.
+
 ## Lifecycle guarantees
 
 - Actors start sequentially in registration order.
@@ -27,6 +41,7 @@ The package also provides structural `ProcessHost` and `ProcessIO` boundaries fo
 - Process applications absorb host-routed exits and map unexpected failures to exit code one, or to the code selected by an application-supplied mapper.
 - Command catalogs preserve registration order and reject blank or duplicate ids.
 - Command factories receive the exact per-application context and are invoked again for each materialization.
+- Service-until-interrupt disposes its host listener before stop and surfaces stop failures to the caller.
 
 ## License
 

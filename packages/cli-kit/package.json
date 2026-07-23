@@ -1,6 +1,6 @@
 {
   "name": "@ariestools/cli-kit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Reusable actor lifecycle core for command-line applications",
   "keywords": [
     "ariestools",
