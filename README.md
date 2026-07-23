@@ -41,9 +41,7 @@ pnpm xy test
 
 ## Migration from `@xyo-network/actor-cli-kit*`
 
-These packages previously lived in [xyo-chain](https://github.com/XYOracleNetwork/xyo-chain) as `@xyo-network/actor-cli-kit`, `@xyo-network/actor-cli-kit-node`, and `@xyo-network/actor-cli-kit-yargs` (versioned with that monorepo). They now publish under `@ariestools/*` starting at **1.0.0**.
-
-Deprecated re-export shims remain in xyo-chain for one release cycle; prefer the `@ariestools/cli-kit*` names for new code.
+These packages previously lived in [xyo-chain](https://github.com/XYOracleNetwork/xyo-chain) as `@xyo-network/actor-cli-kit`, `@xyo-network/actor-cli-kit-node`, and `@xyo-network/actor-cli-kit-yargs`. They publish under `@ariestools/*` starting at **1.0.0**. The xyo-chain re-export shims have been **removed**; depend on `@ariestools/cli-kit*` directly.
 
 ## License
 
