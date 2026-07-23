@@ -11,6 +11,7 @@
     }
   ],
   "area": "cli-kit-yargs",
+  "completedAt": "2026-07-23T18:20:55.162Z",
   "createdAt": "2026-07-23T18:10:25.550Z",
   "description": "Feature 1 (shipped ea31885, cli-kit-yargs runYargsApplication) drops the yargs usage/help block on handler-origin failures (an unambiguous win) but ALSO suppresses the raw error STACK in production — dev still prints the full stack, prod prints only a concise error.message. This matches the family quiet-in-prod policy (sibling runProcessApplication prints nothing in prod) and assumes the consumer's own runtime logging owns fatal-startup stacks. REVIEW-FLAGGED PLAUSIBLE REGRESSION: the sole current consumer, xyo-chain's xl1 server CLI (producer/api/finalizer/bridge), previously got a prod stack on stderr for fatal handler/actor-startup failures; if it relies on cli-kit stderr rather than its own armGlobalErrorHandling/Xl1RuntimeSession logging, prod root-cause diagnosability degrades. RESOLUTION: confirm xyo-chain's logger captures fatal startup stacks (then keep as-is + close) OR decouple in reportHandlerFailure to keep printing the raw error/stack even in prod while still dropping the usage block (default-better, no new option). Best resolved before the 3 remaining CLI migrations adopt the pattern.",
   "id": "XYW-20260723-0BDC90",
@@ -21,7 +22,7 @@
     "risk": 2,
     "urgency": 3
   },
-  "status": "open",
+  "status": "done",
   "stores": {
     "github": {
       "createdByXyWork": true,
@@ -36,8 +37,9 @@
   ],
   "title": "Decide: keep quiet-in-prod handler failures, or decouple to preserve the stack trace",
   "type": "question",
-  "updatedAt": "2026-07-23T18:10:29.858Z",
+  "updatedAt": "2026-07-23T18:20:55.162Z",
   "verification": [
-    "pnpm vitest run (cli-kit-yargs runYargsApplication.spec.ts)"
+    "pnpm vitest run (cli-kit-yargs runYargsApplication.spec.ts)",
+    "Decision: decouple — always print full handler error (incl. stack) on stderr; still omit usage block. Changed reportHandlerFailure in packages/cli-kit-yargs/src/runYargsApplication.ts; removed toConciseMessage; updated README + runYargsApplication.spec.ts. Verified: pnpm xy test packages/cli-kit-yargs/src/spec/runYargsApplication.spec.ts — 16 passed."
   ]
 }

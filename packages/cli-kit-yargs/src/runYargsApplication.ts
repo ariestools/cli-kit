@@ -48,25 +48,15 @@ function reportFailureHandlerError(host: ProcessHost, result: FailureHandlerResu
   if (result.hasError) host.io.error('Error handling application failure:', result.error)
 }
 
-function toConciseMessage(error: unknown): string {
-  if (error instanceof Error) return error.message.length > 0 ? error.message : error.name
-  return String(error)
-}
-
 /**
  * Reports a handler-origin failure without the parser usage/help block. A
  * usage dump is right for a parse/usage error but noise for a handler-origin
- * failure such as a mapped configuration error. In development the full error
- * (including its stack) is surfaced; otherwise only a concise message reaches
- * stderr, matching the established CLI policy of hiding internal detail outside
- * development.
+ * failure such as a mapped configuration error. The raw error (including its
+ * stack when present) always reaches stderr so production root-cause diagnosis
+ * is preserved; only the usage block is suppressed.
  */
 function reportHandlerFailure(host: ProcessHost, error: unknown): void {
-  if (host.isDevelopment) {
-    host.io.error(error)
-  } else {
-    host.io.error(toConciseMessage(error))
-  }
+  host.io.error(error)
 }
 
 /**
@@ -78,10 +68,10 @@ function reportHandlerFailure(host: ProcessHost, error: unknown): void {
  * validation or usage error, including one raised by {@link rejectUnknownCommands})
  * still prints the usage/help block, because the caller mis-invoked the CLI.
  * A handler-origin failure (a thrown command handler or middleware, such as a
- * mapped configuration error) prints only a concise error message to stderr —
- * no usage dump and, outside development, no stack — since the invocation was
- * well-formed. Exit codes and the {@link FailureExitCodeMapper} contract are
- * unchanged; only what is printed per origin differs.
+ * mapped configuration error) prints the raw error to stderr — including its
+ * stack when present — with no usage dump, since the invocation was well-formed.
+ * Exit codes and the {@link FailureExitCodeMapper} contract are unchanged; only
+ * what is printed per origin differs.
  */
 export async function runYargsApplication({
   configure,

@@ -1,0 +1,46 @@
+{
+  "acceptanceCriteria": [
+    "ProcessIO (or a host variant) writes raw Uint8Array to stdout/stderr with no forced trailing LF",
+    "Writes are awaitable and surface write errors (closed-pipe/EPIPE) so a CLI can map them to exit 74",
+    "Bounded readStdin/readFile byte readers available (e.g. 16MiB cap)",
+    "A flush-before-exit path so large stdout is not truncated (vs process.exit)",
+    "immortalizer-cli can migrate onto the host boundary with emittedCli.spec byte-identical"
+  ],
+  "anchors": [
+    {
+      "kind": "file",
+      "path": "packages/cli-kit/src/ProcessHost.ts"
+    }
+  ],
+  "area": "cli-kit-core + cli-kit-node",
+  "createdAt": "2026-07-23T19:40:31.761Z",
+  "description": "cli-kit 1.0.2 ProcessIO is a console/string plane (log/warn/error variadic-unknown that stringify + append a trailing LF, return void; nodeProcessHost = console.log/console.error). This blocks byte-exact CLIs from adopting the host boundary — immortalizer-cli's migration was DEFERRED 2026-07-22 because: (1) canonicalize must emit raw bytes with NO trailing LF; (2) diagnostics are exact 'immortalizer: <code>\\n' on stderr; (3) closed-stdout must map to exit 74 by observing the write-callback error — ProcessIO.log returns void and swallows async EPIPE; (4) bounded 16MiB stdin/file byte reads have no home in ProcessIO. Separately, cli-kit-node host.exit()=process.exit(code) can TRUNCATE un-flushed stdout on large payloads (immortalizer uses process.exitCode to drain first). Need either (A) a byte-plane extension to ProcessIO: awaitable writeStdout/writeStderr(Uint8Array) that surface write errors, plus bounded readStdin/readFile byte readers; and a flush-before-exit path; OR (B) a bring-your-own-IO host that lets the app own a non-ProcessIO byte channel while still using the host's exit/signal/onInterrupt boundary. Unblocks immortalizer-cli (byte-pinned emittedCli.spec) and lifehash-indexer's stdout-is-data discipline.",
+  "id": "XYW-20260723-6FBA69",
+  "priority": {
+    "confidence": 3,
+    "effort": 4,
+    "impact": 3,
+    "risk": 2,
+    "urgency": 2
+  },
+  "status": "open",
+  "stores": {
+    "github": {
+      "createdByXyWork": true,
+      "number": 2,
+      "url": "https://github.com/ariestools/cli-kit/issues/2"
+    }
+  },
+  "tags": [
+    "byte-plane",
+    "cli-kit",
+    "immortalizer",
+    "process-io"
+  ],
+  "title": "ProcessIO byte-plane: awaitable Uint8Array writers + bounded byte readers for byte-exact CLIs",
+  "type": "feature",
+  "updatedAt": "2026-07-23T19:40:34.967Z",
+  "verification": [
+    "immortalizer-cli emittedCli.spec byte-identical after a future migration; cli-kit unit tests for the byte writers/readers"
+  ]
+}

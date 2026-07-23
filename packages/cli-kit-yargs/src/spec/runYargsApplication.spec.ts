@@ -122,7 +122,7 @@ describe('runYargsApplication', () => {
     expect(result.logs).toEqual([])
   })
 
-  it('prints only the concise handler error without a usage block for a handler-origin failure', async () => {
+  it('prints the full handler error without a usage block for a handler-origin failure', async () => {
     const result = fakeHost(['serve'])
     const failure = new Error('handler failed')
 
@@ -145,66 +145,14 @@ describe('runYargsApplication', () => {
       expectExit(error, 1)
     }
 
-    expect(result.errors).toEqual([['handler failed']])
+    expect(result.errors).toEqual([[failure]])
+    expect(result.errors[0]?.[0]).toBe(failure)
     expect(result.errors.flat().join('\n')).not.toContain('fixture serve')
     expect(result.errors.flat().join('\n')).not.toContain('--local')
     expect(result.exits).toEqual([1])
   })
 
-  it('falls back to the error name when a handler throws an Error with an empty message', async () => {
-    const result = fakeHost(['serve'])
-
-    try {
-      await runYargsApplication({
-        configure: parser => parser
-          .scriptName('fixture')
-          .command({
-            command: 'serve',
-            handler: async () => {
-              const emptyMessage = new Error('placeholder')
-              emptyMessage.message = ''
-              throw emptyMessage
-            },
-          })
-          .help()
-          .version(false),
-        host: result.host,
-      })
-    } catch (error) {
-      expectExit(error, 1)
-    }
-
-    expect(result.errors).toEqual([['Error']])
-    expect(result.exits).toEqual([1])
-  })
-
-  it('renders the string form when a handler throws a non-Error value', async () => {
-    const result = fakeHost(['serve'])
-
-    try {
-      await runYargsApplication({
-        configure: parser => parser
-          .scriptName('fixture')
-          .command({
-            command: 'serve',
-            handler: async () => {
-              // eslint-disable-next-line @typescript-eslint/only-throw-error
-              throw 'boom'
-            },
-          })
-          .help()
-          .version(false),
-        host: result.host,
-      })
-    } catch (error) {
-      expectExit(error, 1)
-    }
-
-    expect(result.errors).toEqual([['boom']])
-    expect(result.exits).toEqual([1])
-  })
-
-  it('surfaces the full handler error in development for a handler-origin failure', async () => {
+  it('prints the full handler error in development for a handler-origin failure', async () => {
     const result = fakeHost(['serve'], true)
     const failure = new Error('handler failed')
 
@@ -228,6 +176,32 @@ describe('runYargsApplication', () => {
 
     expect(result.errors).toEqual([[failure]])
     expect(result.errors[0]?.[0]).toBe(failure)
+    expect(result.exits).toEqual([1])
+  })
+
+  it('renders a non-Error value when a handler throws one', async () => {
+    const result = fakeHost(['serve'])
+
+    try {
+      await runYargsApplication({
+        configure: parser => parser
+          .scriptName('fixture')
+          .command({
+            command: 'serve',
+            handler: async () => {
+              // eslint-disable-next-line @typescript-eslint/only-throw-error
+              throw 'boom'
+            },
+          })
+          .help()
+          .version(false),
+        host: result.host,
+      })
+    } catch (error) {
+      expectExit(error, 1)
+    }
+
+    expect(result.errors).toEqual([['boom']])
     expect(result.exits).toEqual([1])
   })
 
@@ -260,7 +234,7 @@ describe('runYargsApplication', () => {
     }
 
     expect(onFailure).toHaveBeenCalledOnce()
-    expect(result.errors).toEqual([['handler failed']])
+    expect(result.errors).toEqual([[failure]])
     expect(result.exits).toEqual([1])
   })
 
@@ -291,13 +265,13 @@ describe('runYargsApplication', () => {
     }
 
     expect(result.errors).toEqual([
-      ['handler failed'],
+      [failure],
       ['Error handling application failure:', failureHandlerError],
     ])
     expect(result.exits).toEqual([1])
   })
 
-  it('prints only the concise middleware error without a usage block', async () => {
+  it('prints the full middleware error without a usage block', async () => {
     const result = fakeHost(['serve'])
     const failure = new Error('middleware failed')
     const handler = vi.fn()
@@ -319,7 +293,7 @@ describe('runYargsApplication', () => {
     }
 
     expect(handler).not.toHaveBeenCalled()
-    expect(result.errors).toEqual([['middleware failed']])
+    expect(result.errors).toEqual([[failure]])
     expect(result.errors.flat().join('\n')).not.toContain('fixture serve')
     expect(result.exits).toEqual([1])
   })
@@ -374,7 +348,7 @@ describe('runYargsApplication', () => {
 
     expect(mapFailureToExitCode).toHaveBeenCalledOnce()
     expect(mapFailureToExitCode).toHaveBeenCalledWith(failure, 'handler')
-    expect(result.errors).toEqual([['handler failed']])
+    expect(result.errors).toEqual([[failure]])
     expect(result.exits).toEqual([70])
   })
 
@@ -413,6 +387,7 @@ describe('runYargsApplication', () => {
 
   it('retains exit code one when the mapper returns undefined', async () => {
     const result = fakeHost(['serve'])
+    const failure = new Error('handler failed')
 
     try {
       await runYargsApplication({
@@ -421,7 +396,7 @@ describe('runYargsApplication', () => {
           .command({
             command: 'serve',
             handler: async () => {
-              throw new Error('handler failed')
+              throw failure
             },
           })
           .help()
@@ -433,9 +408,9 @@ describe('runYargsApplication', () => {
       expectExit(error, 1)
     }
 
-    // A handler-origin failure stays quiet even when the mapper declines it:
-    // the concise message only, no usage block.
-    expect(result.errors).toEqual([['handler failed']])
+    // A handler-origin failure still prints the full error with no usage block
+    // when the mapper declines to choose a different exit code.
+    expect(result.errors).toEqual([[failure]])
     expect(result.errors.flat().join('\n')).not.toContain('fixture serve')
     expect(result.exits).toEqual([1])
   })
@@ -465,7 +440,7 @@ describe('runYargsApplication', () => {
       expectExit(error, 1)
     }
 
-    expect(result.errors).toEqual([['handler failed']])
+    expect(result.errors).toEqual([[failure]])
     expect(result.exits).toEqual([1])
   })
 
