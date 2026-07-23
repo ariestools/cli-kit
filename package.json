@@ -26,9 +26,9 @@
   "sideEffects": false,
   "type": "module",
   "devDependencies": {
-    "@ariestools/eslint-config-flat": "~8.7.21",
-    "@ariestools/toolchain": "~8.7.21",
-    "@ariestools/tsconfig": "~8.7.21",
+    "@ariestools/eslint-config-flat": "~8.7.23",
+    "@ariestools/toolchain": "~8.7.23",
+    "@ariestools/tsconfig": "~8.7.23",
     "eslint": "~10.7.0",
     "eslint-import-resolver-typescript": "~4.4.5",
     "typescript": "~6.0.3",
