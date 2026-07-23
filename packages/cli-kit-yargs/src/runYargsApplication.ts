@@ -48,10 +48,40 @@ function reportFailureHandlerError(host: ProcessHost, result: FailureHandlerResu
   if (result.hasError) host.io.error('Error handling application failure:', result.error)
 }
 
+function toConciseMessage(error: unknown): string {
+  if (error instanceof Error) return error.message.length > 0 ? error.message : error.name
+  return String(error)
+}
+
+/**
+ * Reports a handler-origin failure without the parser usage/help block. A
+ * usage dump is right for a parse/usage error but noise for a handler-origin
+ * failure such as a mapped configuration error. In development the full error
+ * (including its stack) is surfaced; otherwise only a concise message reaches
+ * stderr, matching the established CLI policy of hiding internal detail outside
+ * development.
+ */
+function reportHandlerFailure(host: ProcessHost, error: unknown): void {
+  if (host.isDevelopment) {
+    host.io.error(error)
+  } else {
+    host.io.error(toConciseMessage(error))
+  }
+}
+
 /**
  * Runs a configured Yargs app through the supplied process boundary.
  * Yargs' parse callback prevents its default console and process.exit calls;
  * the adapter then routes the equivalent output and exit through ProcessHost.
+ *
+ * Failure output is scoped by origin. A parse-origin failure (a Yargs
+ * validation or usage error, including one raised by {@link rejectUnknownCommands})
+ * still prints the usage/help block, because the caller mis-invoked the CLI.
+ * A handler-origin failure (a thrown command handler or middleware, such as a
+ * mapped configuration error) prints only a concise error message to stderr —
+ * no usage dump and, outside development, no stack — since the invocation was
+ * well-formed. Exit codes and the {@link FailureExitCodeMapper} contract are
+ * unchanged; only what is printed per origin differs.
  */
 export async function runYargsApplication({
   configure,
@@ -73,9 +103,7 @@ export async function runYargsApplication({
   } catch (error) {
     if (error instanceof ProcessExitError) throw error
     const failureHandlerResult = await invokeFailureHandler(onFailure, error)
-    host.io.error(await parser.getHelp())
-    host.io.error()
-    host.io.error(error)
+    reportHandlerFailure(host, error)
     reportFailureHandlerError(host, failureHandlerResult)
     exitProcess(host, resolveFailureExitCode(mapFailureToExitCode, error, 'handler'))
   }
