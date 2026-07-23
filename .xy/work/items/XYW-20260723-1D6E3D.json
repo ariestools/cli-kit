@@ -1,0 +1,44 @@
+{
+  "acceptanceCriteria": [
+    "A numeric stray positional (0, 123) is rejected as a parse-origin failure -> exit 64",
+    "Holds WITHOUT the consumer setting parse-positional-numbers:false",
+    "Registered commands, declared numeric positionals, and the $0/help path are unaffected",
+    "Tests cover both numeric and string stray tokens"
+  ],
+  "anchors": [
+    {
+      "kind": "file",
+      "path": "packages/cli-kit-yargs/src/rejectUnknownCommands.ts"
+    }
+  ],
+  "area": "cli-kit-yargs",
+  "createdAt": "2026-07-23T21:27:19.419Z",
+  "description": "yargs' default 'parse-positional-numbers' coerces a bare numeric token (0, 123) in argv._ to a JS number. rejectUnknownCommands only inspects STRING tokens, so numeric strays are never rejected and the command silently proceeds. Found 2026-07-22 during the lifehash-indexer migration: 'lifehash-indexer --out file:///tmp/x --resume 0' exited 0, published NOTHING, and printed nothing — the stray '0' was swallowed. Consumers currently must work around it with .parserConfiguration({'parse-positional-numbers': false}), which lifehash did (lifehash 7c8f15b). AFFECTS ALL CURRENT CONSUMERS of the helper: webble-dapp (webble 83a53ba), webble-cli (webble a7a1be1), lifehash-indexer (lifehash 7c8f15b). FIX: inspect every leftover argv._ token regardless of runtime type (coerce to string, or handle typeof 'number') so the guarantee holds without the consumer needing a parserConfiguration workaround.",
+  "id": "XYW-20260723-1D6E3D",
+  "priority": {
+    "confidence": 5,
+    "effort": 2,
+    "impact": 4,
+    "risk": 2,
+    "urgency": 3
+  },
+  "status": "open",
+  "stores": {
+    "github": {
+      "createdByXyWork": true,
+      "number": 3,
+      "url": "https://github.com/ariestools/cli-kit/issues/3"
+    }
+  },
+  "tags": [
+    "cli-kit",
+    "silent-failure",
+    "yargs"
+  ],
+  "title": "rejectUnknownCommands misses numeric stray positionals (yargs coerces them to number)",
+  "type": "bug",
+  "updatedAt": "2026-07-23T21:27:22.400Z",
+  "verification": [
+    "cli-kit vitest; re-verify against lifehash-indexer + the two webble CLIs"
+  ]
+}

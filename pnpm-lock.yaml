@@ -9,14 +9,14 @@ importers:
   .:
     devDependencies:
       '@ariestools/eslint-config-flat':
-        specifier: ~8.7.23
-        version: 8.7.23(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+        specifier: ~8.7.24
+        version: 8.7.24(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       '@ariestools/toolchain':
-        specifier: ~8.7.23
-        version: 8.7.23(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+        specifier: ~8.7.24
+        version: 8.7.24(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       '@ariestools/tsconfig':
-        specifier: ~8.7.23
-        version: 8.7.23
+        specifier: ~8.7.24
+        version: 8.7.24
       eslint:
         specifier: ~10.7.0
         version: 10.7.0(jiti@2.6.1)
@@ -36,11 +36,11 @@ importers:
   packages/cli-kit:
     devDependencies:
       '@ariestools/toolchain':
-        specifier: ~8.7.23
-        version: 8.7.23(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+        specifier: ~8.7.24
+        version: 8.7.24(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       '@ariestools/tsconfig':
-        specifier: ~8.7.23
-        version: 8.7.23
+        specifier: ~8.7.24
+        version: 8.7.24
       eslint:
         specifier: ~10.7.0
         version: 10.7.0(jiti@2.6.1)
@@ -64,11 +64,11 @@ importers:
         version: link:../cli-kit
     devDependencies:
       '@ariestools/toolchain':
-        specifier: ~8.7.23
-        version: 8.7.23(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+        specifier: ~8.7.24
+        version: 8.7.24(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       '@ariestools/tsconfig':
-        specifier: ~8.7.23
-        version: 8.7.23
+        specifier: ~8.7.24
+        version: 8.7.24
       '@types/node':
         specifier: ~26.1.1
         version: 26.1.1
@@ -101,11 +101,11 @@ importers:
         version: 18.0.0
     devDependencies:
       '@ariestools/toolchain':
-        specifier: ~8.7.23
-        version: 8.7.23(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+        specifier: ~8.7.24
+        version: 8.7.24(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       '@ariestools/tsconfig':
-        specifier: ~8.7.23
-        version: 8.7.23
+        specifier: ~8.7.24
+        version: 8.7.24
       eslint:
         specifier: ~10.7.0
         version: 10.7.0(jiti@2.6.1)
@@ -124,23 +124,23 @@ importers:
 
 packages:
 
-  '@ariestools/eslint-config-flat@8.7.23':
-    resolution: {integrity: sha512-WshA8wHPq0J45bDeLZmKhQ/9r9Gsnp8sO9cnr0lENx3VQFCuIL2d/jwkRN3NIJUbEseN7HZ1sH9TKROV9s0xvA==}
+  '@ariestools/eslint-config-flat@8.7.24':
+    resolution: {integrity: sha512-pQvw8cglPLpSbJ3xZOi0scrtr3ZBToY21TY+m42de7p2YfwWL45rjcrmx3km2PEIw0BfsPy9ant0x+1INtvAhw==}
     engines: {node: '>=22'}
     peerDependencies:
       eslint: ^10.3
       eslint-import-resolver-typescript: ^4.4
 
-  '@ariestools/toolchain@8.7.23':
-    resolution: {integrity: sha512-1LOs5W3/+u37sz1iamJI8FIXzCEYR4dxfrVTRblzRKHy0rmqXBC6rFM9I4wKwDIVCSlhOZXca0cpxUXqBZFyjA==}
+  '@ariestools/toolchain@8.7.24':
+    resolution: {integrity: sha512-Ug5UuwBPHXc+Ol+mYFjbx/kuu7X8M7lFqO5G9vtpD668CT9WQNacqKN4TACZMQSINskNpFO3ThOhEqTzqjloHg==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
       eslint: ^10.3
       typescript: ^5.9 || ^6.0
 
-  '@ariestools/tsconfig@8.7.23':
-    resolution: {integrity: sha512-WkFzIORCMjfV1naET14epKbS8siAra6DqWkV854wbvy4oGfwDHxv/UzYs4hFaDUevquUUGyZpNdLCu7Zk9RS3Q==}
+  '@ariestools/tsconfig@8.7.24':
+    resolution: {integrity: sha512-0PecPZvTc/GNg8m196QBzjqbGZMYhUx3RuH3VYk+kWl1x0KoEQL3LD1uYo7V5FSFxL8Zr+oSJEBd0iflJ3ad/Q==}
     engines: {node: '>=22'}
 
   '@babel/code-frame@7.29.7':
@@ -1891,7 +1891,7 @@ packages:
 
 snapshots:
 
-  '@ariestools/eslint-config-flat@8.7.23(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)':
+  '@ariestools/eslint-config-flat@8.7.24(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)':
     dependencies:
       '@eslint/js': 10.0.1(eslint@10.7.0(jiti@2.6.1))
       '@eslint/json': 2.0.1
@@ -1911,9 +1911,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@ariestools/toolchain@8.7.23(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)':
+  '@ariestools/toolchain@8.7.24(@types/node@26.1.1)(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(cosmiconfig@9.0.2(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)':
     dependencies:
-      '@ariestools/eslint-config-flat': 8.7.23(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
+      '@ariestools/eslint-config-flat': 8.7.24(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1)))(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3)
       cosmiconfig-typescript-loader: 6.3.0(@types/node@26.1.1)(cosmiconfig@9.0.2(typescript@6.0.3))(typescript@6.0.3)
       esbuild: 0.28.1
       eslint: 10.7.0(jiti@2.6.1)
@@ -1926,7 +1926,7 @@ snapshots:
       - eslint-import-resolver-typescript
       - supports-color
 
-  '@ariestools/tsconfig@8.7.23': {}
+  '@ariestools/tsconfig@8.7.24': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:

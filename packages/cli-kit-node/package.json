@@ -51,8 +51,8 @@
     "@ariestools/cli-kit": "workspace:~"
   },
   "devDependencies": {
-    "@ariestools/toolchain": "~8.7.23",
-    "@ariestools/tsconfig": "~8.7.23",
+    "@ariestools/toolchain": "~8.7.24",
+    "@ariestools/tsconfig": "~8.7.24",
     "@types/node": "~26.1.1",
     "eslint": "~10.7.0",
     "eslint-import-resolver-typescript": "~4.4.5",
