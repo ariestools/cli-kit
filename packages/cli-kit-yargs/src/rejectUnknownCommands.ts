@@ -44,7 +44,24 @@ function knownCommandNames(commands: readonly CommandModule[]): ReadonlySet<stri
  * matched command name remains in `argv._`, the check compares each token
  * against the names declared by `commands`.
  *
- * Two constraints keep the check accurate; both are the caller's to honor:
+ * Every non-empty leftover token is inspected regardless of its runtime type.
+ * Yargs types `argv._` as `(string | number)[]` and, with its default
+ * `parse-positional-numbers` enabled, coerces a bare numeric token to a JS
+ * number — so `app 0`, `app 123`, and `app -5` are rejected as
+ * `Unknown command: 0` (and so on) rather than slipping through. Consumers do
+ * not need `.parserConfiguration({ 'parse-positional-numbers': false })` to get
+ * a numeric stray flagged. Two details of that normalization:
+ *
+ * - The message echoes the coerced value rather than the raw text, so an exotic
+ *   numeric literal is reported in its normalized form: `1e3` reads
+ *   `Unknown command: 1000`, `0x10` reads `16`, and `1.50` reads `1.5`. The
+ *   token is rejected correctly in every case; only the echoed text differs.
+ *   Yargs has already coerced by the time a `.check()` runs, so the raw text is
+ *   not recoverable here.
+ * - An empty token (`app ""`) is skipped, because it names no command and would
+ *   report as a blank `Unknown command: `. It falls through to `$0` as before.
+ *
+ * Four constraints keep the check accurate; all are the caller's to honor:
  *
  * - `commands` MUST equal the set registered on the parser via `.command(...)`.
  *   The accepted-name set is derived from this array, not read back from the
@@ -54,15 +71,32 @@ function knownCommandNames(commands: readonly CommandModule[]): ReadonlySet<stri
  *   the same array (see the example below) so the two cannot diverge.
  * - Every accepted positional MUST be declared in its command string as
  *   `<arg>`/`[arg]`/`[arg..]`. Yargs consumes declared positionals out of
- *   `argv._` before the check runs, so they are safe; but a command that reads
- *   ad-hoc or variadic positionals it never declared leaves them in `argv._`,
- *   where this check rejects the first as `Unknown command: <value>`.
+ *   `argv._` into named keys before the check runs — including numeric-valued
+ *   ones, so `serve <port>` invoked as `serve 8080` is safe — but a command that
+ *   reads ad-hoc or variadic positionals it never declared leaves them in
+ *   `argv._`, where this check rejects the first as `Unknown command: <value>`.
+ * - A subcommand registered inside a parent command's `builder` MUST also appear
+ *   in `commands`. Yargs leaves both tokens in `argv._` (`db migrate` yields
+ *   `['db', 'migrate']`), so a nested name absent from this array is rejected as
+ *   `Unknown command: migrate`. Passing the nested modules alongside the
+ *   top-level ones fixes that, at the cost of a flat accepted-name set: the
+ *   nested name is then also accepted at the top level, where it falls through
+ *   to `$0`.
+ * - Tokens after a `--` separator are NOT passthrough unless the caller enables
+ *   `.parserConfiguration({ 'populate--': true })`. Yargs leaves `populate--`
+ *   off by default, which merges those tokens into `argv._` rather than
+ *   `argv['--']`, so `app local -- raw` is rejected as `Unknown command: raw`
+ *   (and `app local -- 5` as `Unknown command: 5`). Enabling `populate--` routes
+ *   them to `argv['--']`, out of `argv._` and out of this check's reach.
  *
  * Note: for an unknown token, Yargs runs the failing check first (recording the
- * parse-origin failure) but still invokes the `$0` default command's handler
- * before surfacing that failure. Keep the default command's handler
- * side-effect-free — printing a usage block is the intended shape — so the
- * flagged exit remains authoritative.
+ * parse-origin failure) but still invokes the matched command's handler before
+ * surfacing that failure — the `$0` default command for a bare stray token, and
+ * the named command for `app publish 0`. `parseAsync` awaits an async handler to
+ * completion, so its side effects commit before the flagged exit. Keep handlers
+ * that can be reached alongside a stray token side-effect-free — for `$0`,
+ * printing a usage block is the intended shape — so the flagged exit remains
+ * authoritative.
  *
  * Apply it after every `.command(...)` registration and before `.help()`:
  *
@@ -74,9 +108,13 @@ function knownCommandNames(commands: readonly CommandModule[]): ReadonlySet<stri
 export function rejectUnknownCommands(parser: Argv, commands: readonly CommandModule[]): Argv {
   const known = knownCommandNames(commands)
   return parser.check((argv) => {
-    const unknown = argv._.find(
-      (token): token is string => typeof token === 'string' && token.length > 0 && !known.has(token),
-    )
+    // `argv._` is `(string | number)[]`: with Yargs' default
+    // `parse-positional-numbers` a bare numeric token is coerced to a JS number,
+    // so every token is normalized to its string form before comparison.
+    // Narrowing to `typeof token === 'string'` here would skip numeric strays
+    // entirely and let the command silently proceed. The empty token is the one
+    // exclusion: it names no command and would report as a blank message.
+    const unknown = argv._.map(String).find(token => token.length > 0 && !known.has(token))
     if (unknown !== undefined) throw new Error(`Unknown command: ${unknown}`)
     return true
   })
